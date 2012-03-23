@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<project name="taskblaster" basedir=".">
+
+  <taskdef name="jscomp"
+           classname="com.google.javascript.jscomp.ant.CompileTask"
+           classpath="./bin/compiler.jar"/>
+
+  <property file="my.properties"/>
+
+  <target name="clean">
+    <delete dir="${destdir}"/>
+  </target>
+
+  <target name="local">
+    <property name="server" value="//localhost:8080"/>
+    <property name="destdir" location="web.local"/>
+  </target>
+
+  <target name="live">
+    <property name="server" value="//${appname}.appspot.com"/>
+    <property name="destdir" location="web.live"/>
+  </target>
+
+  <target name="compilejs">
+    <jscomp compilationLevel="advanced" debug="false"
+            output="${destdir}/js/bookmarklet.min.js">
+      <sources dir="${basedir}/src/bookmarklet">
+        <file name="bookmarklet.js"/>
+      </sources>
+    </jscomp>
+    <jscomp compilationLevel="advanced" debug="false"
+            output="${destdir}/js/loader.min.js">
+      <sources dir="${basedir}/src/bookmarklet">
+        <file name="loader.js"/>
+      </sources>
+    </jscomp>
+    <jscomp compilationLevel="advanced" debug="false"
+            output="${destdir}/js/savepage.min.js">
+      <sources dir="${basedir}/src/bookmarklet">
+        <file name="savepage.js"/>
+      </sources>
+    </jscomp>
+    <replace dir="${destdir}/js"
+             token="$SERVER"
+             value="${server}"/>
+  </target>
+
+  <target name="copyfiles">
+    <copy file="${basedir}/src/bookmarklet/savepage.html"
+          todir="${destdir}"/>
+    <copy todir="${destdir}">
+      <fileset dir="${basedir}/src">
+        <include name="*.yaml"/>
+        <include name="*.py"/>
+        <exclude name="*_test.py"/>
+      </fileset>
+    </copy>
+    <replace file="${destdir}/app.yaml"
+             token="$APPNAME"
+             value="${appname}"/>
+    <replace file="${destdir}/app.yaml"
+             token="$EMAIL"
+             value="${email}"/>
+    <replace file="${destdir}/pinboardsaver.py"
+             token="$PINBOARDUSERNAME"
+             value="${pinboardusername}"/>
+    <replace file="${destdir}/pinboardsaver.py"
+             token="$PINBOARDPASSWORD"
+             value="${pinboardpassword}"/>
+  </target>
+
+  <target name="build.local" depends="local,compilejs,copyfiles">
+  </target>
+
+  <target name="build.live" depends="live,compilejs,copyfiles">
+  </target>
+
+  <target name="test">
+    <exec executable="python">
+      <arg value="${basedir}/src/query_test.py"/>
+    </exec>
+    <exec executable="python">
+      <arg value="${basedir}/src/url_test.py"/>
+    </exec>
+    <exec executable="python">
+      <arg value="${basedir}/src/taglist_test.py"/>
+    </exec>
+    <exec executable="python">
+      <arg value="${basedir}/src/utmfilter_test.py"/>
+    </exec>
+  </target>
+
+  <target name="deploy" depends="build.live,test">
+    <exec executable="${basedir}/bin/deploy.sh"/>
+  </target>
+
+  <target name="run" depends="build.local">
+    <exec executable="${basedir}/bin/run.sh"/>
+  </target>
+
+</project>
+

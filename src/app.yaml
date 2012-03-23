@@ -1,0 +1,32 @@
+application: $APPNAME
+version: 1
+runtime: python
+api_version: 1
+
+inbound_services:
+- mail
+
+handlers:
+- url: /js
+  static_dir: js
+
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+
+- url: /savepage\.html
+  static_files: savepage.html
+  upload: savepage.html
+
+- url: /_ah/mail/$EMAIL@$APPNAME.appspotmail.com
+  script: main.py
+  login: admin
+
+- url: /bookmarklet/worker
+  script: main.py
+  login: admin
+
+- url: .*
+  script: main.py
+  login: admin
+
