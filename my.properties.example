@@ -1,5 +1,5 @@
 appname = YOUR_APP_NAME 
-email = YOUR_GMAIL (for logging into app engine)
+email = YOUR_EMAIL_USERNAME (for email posting)
 pinboardusername = YOUR_PINBOARD_USERNAME
 pinboardpassword = YOUR_PINBOARD_PASSWORD
 
