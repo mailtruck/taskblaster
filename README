@@ -1,1 +1,9 @@
-Coming soon...
+More info:
+
+To get up and running:
+
+* Copy the "my.properties" file to "my.properties". Edit the variables in that file.
+
+* The build.xml contains the Ant rules for building and deploying the site.
+
+Good luck!
